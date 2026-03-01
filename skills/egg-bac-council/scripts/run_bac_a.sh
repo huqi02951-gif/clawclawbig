@@ -7,33 +7,13 @@ TS=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 OUT_JSON="$HOME/.openclaw/audits/bac_latest.json"
 OUT_MD="$HOME/.openclaw/audits/bac_latest.md"
 
-run_member(){
-  local role="$1" prompt="$2"
-  openclaw sessions spawn --runtime subagent --mode run --model openai-codex/gpt-5.2-codex --task "你是${role}。议题：${ISSUE}。${prompt}。仅输出：结论(1句)+3条要点+1条风险。" --json
-}
-
-risk=$(run_member "risk_council" "从合规与最坏场景评估")
-growth=$(run_member "growth_council" "从增长收益评估")
-eng=$(run_member "engineering_council" "从实现复杂度与回滚评估")
-finops=$(run_member "finops_council" "从成本与资源评估")
-ops=$(run_member "ops_council" "从协同与执行SLA评估")
-
-# 简单汇总（由脚本模板归档，实际裁决仍由main在会话中完成）
 cat > "$OUT_JSON" <<JSON
 {
   "timestamp":"$TS",
-  "issue":$(python3 - <<PY
-import json
-print(json.dumps('$ISSUE',ensure_ascii=False))
-PY
-),
-  "members":{
-    "risk":$risk,
-    "growth":$growth,
-    "engineering":$eng,
-    "finops":$finops,
-    "ops":$ops
-  }
+  "issue":"$ISSUE",
+  "mode":"A_on_demand",
+  "members":["risk_council","growth_council","engineering_council","finops_council","ops_council"],
+  "note":"Use OpenClaw sessions_spawn tool from main agent to execute 5-member parallel debate and fill decision fields."
 }
 JSON
 
@@ -42,14 +22,17 @@ cat > "$OUT_MD" <<MD
 时间: $TS
 议题: $ISSUE
 
-## 委员输出已生成
+## 委员（5人）
 - risk_council
 - growth_council
 - engineering_council
 - finops_council
 - ops_council
 
-## 主席裁决模板（main填充）
+## 执行说明
+请由主Agent通过 sessions_spawn 并行拉起5位委员，收集观点后由主Agent裁决。
+
+## 主席裁决模板
 - 结论:
 - 执行路径:
 - 风险:
