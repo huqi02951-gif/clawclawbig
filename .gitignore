@@ -1,0 +1,3 @@
+skills/**/.venv/
+**/__pycache__/
+*.pyc
