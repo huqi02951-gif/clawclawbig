@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TicketEnvelope",
+  "type": "object",
+  "required": [
+    "source_topic",
+    "target_topic",
+    "priority",
+    "summary",
+    "action_required",
+    "deadline",
+    "sensitivity",
+    "owner"
+  ],
+  "properties": {
+    "source_topic": { "type": "integer" },
+    "target_topic": { "type": "integer" },
+    "priority": { "type": "string", "enum": ["P0", "P1", "P2"] },
+    "summary": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "action_required": { "type": "string", "minLength": 1, "maxLength": 300 },
+    "deadline": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "sensitivity": { "type": "string", "enum": ["public", "internal", "restricted"] },
+    "owner": { "type": "string", "minLength": 1, "maxLength": 64 }
+  },
+  "additionalProperties": true
+}
